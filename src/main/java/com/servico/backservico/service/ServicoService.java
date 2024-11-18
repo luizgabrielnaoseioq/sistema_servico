@@ -44,9 +44,7 @@ public class ServicoService {
     }
 
     public void excluir(Long id){
-        Servico servico = servicoRepository.findById(id).get();
+        Servico servico = servicoRepository.findById(id).orElseThrow();
         servicoRepository.delete(servico);
     }
-
-
 }

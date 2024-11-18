@@ -31,7 +31,7 @@ public class ServicoController {
         return servicoService.buscarPagamentoPagamentosCancelados();
     }
 
-    @GetMapping("/")
+    @PostMapping("/")
     public Servico inserir(@RequestBody Servico servico){
         return servicoService.inserir(servico);
     }
