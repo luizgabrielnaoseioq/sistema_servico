@@ -5,10 +5,11 @@ import com.servico.backservico.service.ServicoService;
 import jakarta.websocket.server.PathParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+@Controller
 @RestController
 @RequestMapping("/api/servico")
 public class ServicoController {
@@ -16,7 +17,7 @@ public class ServicoController {
     @Autowired
     private ServicoService servicoService;
 
-    @GetMapping("/")
+    @GetMapping("/find_all")
     public List<Servico> buscarTodos(){
         return servicoService.buscarTodos();
     }
@@ -31,12 +32,12 @@ public class ServicoController {
         return servicoService.buscarPagamentoPagamentosCancelados();
     }
 
-    @PostMapping("/")
+    @PostMapping("/inserirservico")
     public Servico inserir(@RequestBody Servico servico){
         return servicoService.inserir(servico);
     }
 
-    @PutMapping("/")
+    @PutMapping("/alterarservico")
     public Servico alterar(@RequestBody Servico servico){
         return servicoService.alterar(servico);
     }

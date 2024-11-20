@@ -2,6 +2,7 @@ package com.servico.backservico.service;
 
 import com.servico.backservico.entity.Servico;
 import com.servico.backservico.repository.ServicoRepository;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +25,7 @@ public class ServicoService {
         return servicoRepository.buscarServicosPagamentoCancelados();
     }
 
-    public Servico inserir(Servico servico){
+    public Servico inserir(@org.jetbrains.annotations.NotNull Servico servico){
         if (servico.getValorPago()==null || servico.getValorPago()==0 || servico.getDataPagamento()==null){
             servico.setStatus("Pendente");
         } else {
@@ -34,7 +35,7 @@ public class ServicoService {
         return servicoRepository.saveAndFlush(servico);
     }
 
-    public Servico alterar(Servico servico){
+    public Servico alterar(@NotNull Servico servico){
         if (servico.getValorPago()!= null && servico.getValorPago() > 0 && servico.getDataPagamento() != null){
             servico.setStatus("Realizado");
         } else {
