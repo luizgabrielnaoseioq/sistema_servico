@@ -1,0 +1,19 @@
+meta {
+  name: teste
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:8080/api/servico/inserirservico
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+      "nome_cliente": "João Augusto",
+      "descricao_servico": "Nova rede de gas!",
+      "valor_servico": 350
+  }
+}

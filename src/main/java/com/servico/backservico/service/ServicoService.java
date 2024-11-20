@@ -26,12 +26,14 @@ public class ServicoService {
     }
 
     public Servico inserir(@org.jetbrains.annotations.NotNull Servico servico){
-        if (servico.getValorPago()==null || servico.getValorPago()==0 || servico.getDataPagamento()==null){
+        // Configuração do status com base nos valores
+        if (servico.getValorPago() == null || servico.getValorPago() == 0 || servico.getDataPagamento() == null) {
             servico.setStatus("Pendente");
         } else {
             servico.setStatus("Realizado");
         }
 
+        // Persistência no banco
         return servicoRepository.saveAndFlush(servico);
     }
 
