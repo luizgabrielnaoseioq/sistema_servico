@@ -1,9 +1,0 @@
-{
-  "version": "1",
-  "name": "Servico",
-  "type": "collection",
-  "ignore": [
-    "node_modules",
-    ".git"
-  ]
-}

@@ -10,6 +10,7 @@ import java.util.List;
 
 @Service
 public class ServicoService {
+
     @Autowired
     private ServicoRepository servicoRepository;
 
@@ -40,10 +41,14 @@ public class ServicoService {
     public Servico alterar(@NotNull Servico servico){
         if (servico.getValorPago()!= null && servico.getValorPago() > 0 && servico.getDataPagamento() != null){
             servico.setStatus("Realizado");
-        } else {
-
         }
         return servicoRepository.saveAndFlush(servico);
+    }
+
+    public void calcelarServico(Long id){
+        Servico servico = servicoRepository.findById(id).orElseThrow();
+        servico.setStatus("Cancelado");
+        servicoRepository.save(servico);
     }
 
     public void excluir(Long id){
