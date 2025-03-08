@@ -1,11 +1,9 @@
-import logo from './logo.svg';
 import './App.css';
+import Servico from './servico/Servico'
 
 function App() {
   return (
-    <div>
-      <h1> Cadastro de Seriviços </h1>
-    </div>
+    <Servico/>
   );
 }
 
