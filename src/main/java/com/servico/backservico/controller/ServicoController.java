@@ -62,8 +62,14 @@ public class ServicoController {
 
     @PutMapping("/{id}")
     @CrossOrigin("http://localhost:3003")
-    public ResponseEntity<Void> cancelar(@PathVariable("id") Long id){
-        servicoService.cancelarServico(id);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Servico> cancelar(@PathVariable("id") Long id, @RequestBody Servico servicoAtualizado) {
+        Servico servico = servicoService.buscarPorId(id);
+        if (servico == null) {
+            return ResponseEntity.notFound().build();
+        }
+        servico.setStatus(servicoAtualizado.getStatus()); // Altera apenas o status
+        servicoService.salvar(servico); // Salva no banco
+        return ResponseEntity.ok(servico);
     }
+
 }

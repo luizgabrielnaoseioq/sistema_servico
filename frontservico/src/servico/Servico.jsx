@@ -14,10 +14,7 @@ function Servico() {
     const [servicos, setServicos] = useState([]);
 
     useEffect(() => {
-        axios.get("http://localhost:8080/api/servico/").then(result => {
-            console.log("Dados recebidos:", result.data);
-            setServicos(result.data.filter(serv => serv.nomeCliente)); // Filtra itens sem nomeCliente
-        });
+        buscarTodos();
     }, []);
 
     function handleChange(event){
@@ -26,13 +23,15 @@ function Servico() {
 
     function HandleSubmit(event){
         event.preventDefault();
-        if (servico.id===undefined){
-            axios.post("http://localhost:8080/api/servico/", servico).then(result=>{
+        if (servico.id === undefined) {
+            axios.post("http://localhost:8080/api/servico/", servico).then(result => {
                 console.log(result);
+                buscarTodos();  // Atualiza a lista de serviços após o cadastro
             });
         } else {
-            axios.put("http://localhost:8080/api/servico/", servico).then(result=>{
+            axios.put("http://localhost:8080/api/servico/", servico).then(result => {
                 console.log(result);
+                buscarTodos();  // Atualiza a lista de serviços após a atualização
             });
         }
         limpar();
@@ -56,13 +55,36 @@ function Servico() {
     }
 
     function cancelar(id) {
-        axios.put("http://localhost:8080/api/servico/" + id).then(() => {
-            setServicos(servicos.map(serv =>
-                serv.id === id ? { ...serv, status: "cancelado" } : serv
-            ));
+        axios.put(`http://localhost:8080/api/servico/${id}`, { status: "cancelado" })
+            .then(() => {
+                setServicos(servicos.map(serv =>
+                    serv.id === id ? { ...serv, status: "cancelado" } : serv
+                ));
+            })
+            .catch(error => console.error("Erro ao cancelar serviço:", error));
+    }
+
+
+    function buscarTodos(){
+        axios.get("http://localhost:8080/api/servico/").then(result => {
+            console.log("Dados recebidos:", result.data);
+            setServicos(result.data.filter(serv => serv.nomeCliente)); // Filtra itens sem nomeCliente
         });
     }
 
+    function buscarPagamentoPendente(){
+        axios.get("http://localhost:8080/api/servico/pagamentoPendente").then(result => {
+            console.log("Dados recebidos:", result.data);
+            setServicos(result.data.filter(serv => serv.nomeCliente)); // Filtra itens sem nomeCliente
+        });
+    }
+
+    function buscarPagamentoCancelado(){
+        axios.get("http://localhost:8080/api/servico/cancelados").then(result => {
+            console.log("Dados recebidos:", result.data);
+            setServicos(result.data.filter(serv => serv.nomeCliente)); // Filtra itens sem nomeCliente
+        });
+    }
 
     return (
         <div className="container">
@@ -91,7 +113,8 @@ function Servico() {
                     </div>
                     <div>
                         <label className="form-label"> Valor do Serviço </label>
-                        <input onChange={handleChange} value={servico.valorServico || ''} name="valorServico" type="number"
+                        <input onChange={handleChange} value={servico.valorServico || ''} name="valorServico"
+                               type="number"
                                className="form-control"/>
                     </div>
                     <div>
@@ -101,14 +124,20 @@ function Servico() {
                     </div>
                     <div>
                         <label className="form-label"> Data do Pagamento </label>
-                        <input onChange={handleChange} value={servico.dataPagamento || ''} name="dataPagamento" type="date"
+                        <input onChange={handleChange} value={servico.dataPagamento || ''} name="dataPagamento"
+                               type="date"
                                className="form-control"/>
                     </div>
                     <br/>
                     <input type="submit" value="Cadastrar" className="btn btn-success"></input>
-
                 </div>
-                <hr></hr>
+                <hr/>
+                <hr/>
+
+                <button onClick={buscarTodos} type="button"  className="btn btn-primary">Listar Todos</button>&nbsp;&nbsp;
+                <button onClick={buscarPagamentoPendente} type="button"  className="btn btn-secondary">Servições com Pagamento Pendente</button>&nbsp;&nbsp;
+                <button onClick={buscarPagamentoCancelado} type="button"  className="btn btn-success">Servições Cancelados</button>
+
                 <table className="table">
                     <thead>
                     <tr>
@@ -120,25 +149,26 @@ function Servico() {
                     </tr>
                     </thead>
                     <tbody>
-                        {servicos.map((serv) => (
-                            <tr key={serv.id}>
-                                <td>{serv.nomeCliente}</td>
-                                <td>{serv.descricaoServico}</td>
-                                <td>{serv.valorServico}</td>
-                                <td>{serv.status}</td>
-                                <td>
-                                    {serv.status!=="cancelado" &&(
-                                    <button onClick={()=>setServico(serv)} className="btn btn-primary">Alterar</button>
-                                    )}
-                                    &nbsp;&nbsp;
-                                    {serv.status!=='cancelado' && (
-                                    <button onClick={()=>excluir(serv.id)} className="btn btn-danger">Excluir</button>
-                                    )}
-                                    &nbsp;&nbsp;
-                                    <button onClick={()=>cancelar(serv.id)} className="btn btn-warning">Cancelar</button>
-                                </td>
-                            </tr>
-                        ))}
+                    {servicos.map((serv) => (
+                        <tr key={serv.id}>
+                            <td>{serv.nomeCliente}</td>
+                            <td>{serv.descricaoServico}</td>
+                            <td>{serv.valorServico}</td>
+                            <td>{serv.status}</td>
+                            <td>
+                                {serv.status !== "cancelado" && (
+                                    <button onClick={() => setServico(serv)}
+                                            className="btn btn-primary">Alterar</button>
+                                )}
+                                &nbsp;&nbsp;
+                                {serv.status !== 'cancelado' && (
+                                    <button onClick={() => excluir(serv.id)} className="btn btn-danger">Excluir</button>
+                                )}
+                                &nbsp;&nbsp;
+                                <button onClick={() => cancelar(serv.id)} className="btn btn-warning">Cancelar</button>
+                            </td>
+                        </tr>
+                    ))}
                     </tbody>
                 </table>
             </form>

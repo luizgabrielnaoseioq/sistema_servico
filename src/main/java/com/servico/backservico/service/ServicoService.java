@@ -57,4 +57,12 @@ public class ServicoService {
         Servico servico = servicoRepository.findById(id).orElseThrow();
         servicoRepository.delete(servico);
     }
+
+    public Servico buscarPorId(Long id) {
+        return servicoRepository.findById(id).orElse(null);
+    }
+
+    public Servico salvar(Servico servico) {
+        return servicoRepository.save(servico);
+    }
 }
