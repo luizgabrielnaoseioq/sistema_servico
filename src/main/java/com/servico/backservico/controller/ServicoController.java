@@ -15,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/servico")
+@CrossOrigin(origins = "http://localhost:3003")
 public class ServicoController {
 
     @Autowired
@@ -59,10 +60,10 @@ public class ServicoController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/{id}")
+    @PutMapping("/{id}")
     @CrossOrigin("http://localhost:3003")
     public ResponseEntity<Void> cancelar(@PathVariable("id") Long id){
-        servicoService.calcelarServico(id);
+        servicoService.cancelarServico(id);
         return ResponseEntity.ok().build();
     }
 }

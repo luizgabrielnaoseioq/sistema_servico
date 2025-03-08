@@ -4,14 +4,21 @@ import axios from 'axios';
 
 function Servico() {
 
-    const [servico, setServico] = useState({nomeCliente:'', dataInicio:'', dataTermino:'', descricaoServico:'', valorServico:'', valorPago:'', dataPagamento:''});
+    const [servico, setServico] = useState({nomeCliente:"",
+        dataInicio:"",
+        dataTermino:"",
+        descricaoServico:"",
+        valorServico:"",
+        valorPago:"",
+        dataPagamento:""});
     const [servicos, setServicos] = useState([]);
 
     useEffect(() => {
-        axios.get("http://localhost:8080/api/servico/").then(result=>{
-            setServicos(result.data);
+        axios.get("http://localhost:8080/api/servico/").then(result => {
+            console.log("Dados recebidos:", result.data);
+            setServicos(result.data.filter(serv => serv.nomeCliente)); // Filtra itens sem nomeCliente
         });
-    },[]);
+    }, []);
 
     function handleChange(event){
         setServico({...servico,[event.target.name]:event.target.value});
@@ -19,7 +26,7 @@ function Servico() {
 
     function HandleSubmit(event){
         event.preventDefault();
-        if (servico.id){
+        if (servico.id===undefined){
             axios.post("http://localhost:8080/api/servico/", servico).then(result=>{
                 console.log(result);
             });
@@ -28,7 +35,34 @@ function Servico() {
                 console.log(result);
             });
         }
+        limpar();
     }
+
+    function limpar(){
+        setServico({
+            dataInicio:"",
+            dataTermino:"",
+            descricaoServico:"",
+            valorServico:"",
+            valorPago:"",
+            dataPagamento:""
+        });
+    }
+
+    function excluir(id) {
+        axios.delete("http://localhost:8080/api/servico/" + id).then(() => {
+            setServicos(servicos.filter(serv => serv.id !== id));
+        });
+    }
+
+    function cancelar(id) {
+        axios.put("http://localhost:8080/api/servico/" + id).then(() => {
+            setServicos(servicos.map(serv =>
+                serv.id === id ? { ...serv, status: "cancelado" } : serv
+            ));
+        });
+    }
+
 
     return (
         <div className="container">
@@ -37,37 +71,37 @@ function Servico() {
                 <div className="col-6">
                     <div>
                         <label className="form-label"> Nome do Cliente </label>
-                        <input onChange={handleChange} value={servico.nomeCliente} name="nomeCliente" type="text"
+                        <input onChange={handleChange} value={servico.nomeCliente || ''} name="nomeCliente" type="text"
                                className="form-control"/>
                     </div>
                     <div>
                         <label className="form-label"> Data de Inicio </label>
-                        <input onChange={handleChange} value={servico.dataInicio} name="dataInicio" type="date"
+                        <input onChange={handleChange} value={servico.dataInicio || ''} name="dataInicio" type="date"
                                className="form-control"/>
                     </div>
                     <div>
                         <label className="form-label"> Data de Termino </label>
-                        <input onChange={handleChange} value={servico.dataTermino} name="dataTermino" type="date"
+                        <input onChange={handleChange} value={servico.dataTermino || ''} name="dataTermino" type="date"
                                className="form-control"/>
                     </div>
                     <div>
                         <label className="form-label"> Descrição do Serviço </label>
-                        <input onChange={handleChange} value={servico.descricaoServico} name="descricaoServico"
+                        <input onChange={handleChange} value={servico.descricaoServico || ''} name="descricaoServico"
                                type="text" className="form-control"/>
                     </div>
                     <div>
                         <label className="form-label"> Valor do Serviço </label>
-                        <input onChange={handleChange} value={servico.valorServico} name="valorServico" type="number"
+                        <input onChange={handleChange} value={servico.valorServico || ''} name="valorServico" type="number"
                                className="form-control"/>
                     </div>
                     <div>
                         <label className="form-label"> Valor Pago </label>
-                        <input onChange={handleChange} value={servico.valorPago} name="valorPago" type="number"
+                        <input onChange={handleChange} value={servico.valorPago || ''} name="valorPago" type="number"
                                className="form-control"/>
                     </div>
                     <div>
                         <label className="form-label"> Data do Pagamento </label>
-                        <input onChange={handleChange} value={servico.dataPagamento} name="dataPagamento" type="date"
+                        <input onChange={handleChange} value={servico.dataPagamento || ''} name="dataPagamento" type="date"
                                className="form-control"/>
                     </div>
                     <br/>
@@ -86,20 +120,22 @@ function Servico() {
                     </tr>
                     </thead>
                     <tbody>
-                    {servicos.map(serv => (
-                            <tr>
+                        {servicos.map((serv) => (
+                            <tr key={serv.id}>
                                 <td>{serv.nomeCliente}</td>
                                 <td>{serv.descricaoServico}</td>
                                 <td>{serv.valorServico}</td>
                                 <td>{serv.status}</td>
                                 <td>
-                                    {serv.status!="cancelado" &&
+                                    {serv.status!=="cancelado" &&(
                                     <button onClick={()=>setServico(serv)} className="btn btn-primary">Alterar</button>
-                                    }&nbsp;&nbsp;
-                                    {serv.status!='cancelado' &&
-                                    <button className="btn btn-danger">Excluir</button>
-                                    }&nbsp;&nbsp;
-                                    <button className="btn btn-warning">Cancelar</button>
+                                    )}
+                                    &nbsp;&nbsp;
+                                    {serv.status!=='cancelado' && (
+                                    <button onClick={()=>excluir(serv.id)} className="btn btn-danger">Excluir</button>
+                                    )}
+                                    &nbsp;&nbsp;
+                                    <button onClick={()=>cancelar(serv.id)} className="btn btn-warning">Cancelar</button>
                                 </td>
                             </tr>
                         ))}

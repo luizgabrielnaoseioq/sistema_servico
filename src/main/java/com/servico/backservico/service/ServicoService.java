@@ -45,10 +45,12 @@ public class ServicoService {
         return servicoRepository.saveAndFlush(servico);
     }
 
-    public void calcelarServico(Long id){
-        Servico servico = servicoRepository.findById(id).orElseThrow();
-        servico.setStatus("Cancelado");
-        servicoRepository.save(servico);
+    public void cancelarServico(Long id) {
+        Servico servico = servicoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Serviço não encontrado"));
+
+        servico.setStatus("cancelado"); // Atualiza o status
+        servicoRepository.save(servico); // Salva no banco
     }
 
     public void excluir(Long id){
