@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ServicoService {
@@ -26,7 +27,7 @@ public class ServicoService {
         return servicoRepository.buscarServicosPagamentoCancelados();
     }
 
-    public Servico inserir(@org.jetbrains.annotations.NotNull Servico servico){
+    public Servico inserir(@NotNull Servico servico){
         // Configuração do status com base nos valores
         if (servico.getValorPago() == null || servico.getValorPago() == 0 || servico.getDataPagamento() == null) {
             servico.setStatus("Pendente");
@@ -39,23 +40,40 @@ public class ServicoService {
     }
 
     public Servico alterar(@NotNull Servico servico){
-        if (servico.getValorPago()!= null && servico.getValorPago() > 0 && servico.getDataPagamento() != null){
-            servico.setStatus("Realizado");
+        // Verificando se o serviço existe antes de tentar atualizar
+        if (servico.getId() == null || !servicoRepository.existsById(servico.getId())) {
+            throw new IllegalArgumentException("Serviço não encontrado para atualização");
         }
+
+        // Atualizando o status de pagamento
+        if (servico.getValorPago() != null && servico.getValorPago() > 0 && servico.getDataPagamento() != null) {
+            servico.setStatus("Realizado");
+        } else {
+            servico.setStatus("Pendente");
+        }
+
+        // Persistindo as alterações
         return servicoRepository.saveAndFlush(servico);
     }
 
     public void cancelarServico(Long id) {
-        Servico servico = servicoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Serviço não encontrado"));
+        Optional<Servico> servicoOpt = servicoRepository.findById(id);
 
+        if (servicoOpt.isEmpty()) {
+            throw new RuntimeException("Serviço não encontrado");
+        }
+
+        Servico servico = servicoOpt.get();
         servico.setStatus("cancelado"); // Atualiza o status
         servicoRepository.save(servico); // Salva no banco
     }
 
-    public void excluir(Long id){
-        Servico servico = servicoRepository.findById(id).orElseThrow();
-        servicoRepository.delete(servico);
+    public void excluir(Long id) {
+        Optional<Servico> servicoOpt = servicoRepository.findById(id);
+        if (servicoOpt.isEmpty()) {
+            throw new RuntimeException("Serviço não encontrado para exclusão");
+        }
+        servicoRepository.delete(servicoOpt.get());
     }
 
     public Servico buscarPorId(Long id) {
