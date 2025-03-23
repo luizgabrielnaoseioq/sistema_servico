@@ -15,32 +15,28 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/servico")
-@CrossOrigin(origins = "http://localhost:3003")
+@CrossOrigin(origins = "http://localhost:3000")
 public class ServicoController {
 
     @Autowired
     private ServicoService servicoService;
 
     @GetMapping("/")
-    @CrossOrigin("http://localhost:3003")
     public List<Servico> buscarTodos(){
         return servicoService.buscarTodos();
     }
 
     @GetMapping("/pagamentoPendente")
-    @CrossOrigin("http://localhost:3003")
     public List<Servico> buscarServicosPagamentoPendente(){
         return servicoService.buscarPagamentoPagamentosPendentes();
     }
 
     @GetMapping("/cancelados")
-    @CrossOrigin("http://localhost:3003")
     public List<Servico> buscarServicosPagamentosCancelados(){
         return servicoService.buscarPagamentoPagamentosCancelados();
     }
 
     @PostMapping("/")
-    @CrossOrigin("http://localhost:3003")
     public ResponseEntity<Servico> inserir(@RequestBody Servico servico){
         System.out.println("Recebido: " + servico);
         Servico novoServico = servicoService.inserir(servico);
@@ -48,20 +44,17 @@ public class ServicoController {
     }
 
     @PutMapping("/")
-    @CrossOrigin("http://localhost:3003")
     public Servico alterar(@RequestBody Servico servico){
         return servicoService.alterar(servico);
     }
 
     @DeleteMapping("/{id}")
-    @CrossOrigin("http://localhost:3003")
     public ResponseEntity<Void> excluir(@PathVariable("id") Long id){
         servicoService.excluir(id);
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{id}")
-    @CrossOrigin("http://localhost:3003")
     public ResponseEntity<Servico> cancelar(@PathVariable("id") Long id, @RequestBody Servico servicoAtualizado) {
         Servico servico = servicoService.buscarPorId(id);
         if (servico == null) {
